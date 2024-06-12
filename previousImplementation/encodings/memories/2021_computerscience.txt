@@ -1,0 +1,280 @@
+Object Orient Programming is an approach to programming, a paradigm. 
+The approach mimics the way we naturally interact with the world around us. 
+In our world we interact with objects, and perform actions onto them. 
+We may have a car, and we may want to unlock the car, or start the car. 
+This is how we naturally interact with things. 
+It is the way we already think, and as such it is a great way to program. 
+Before we get serious, let’s start with a whimsical story. 
+Originally there was nothing, without data variations no program could exist. 
+However, something infinitely simply was introduced, but from it would come the potential for something infinitely complex. 
+anything, everything; Binary, it seems so simple; and it is, But, by allowing a difference, a variance, suddenly so much more is possible. 
+Perhaps like some digital big bang, a Codedverse was born; Suddenly mere symbols, instructions and code could become things. 
+From that the perfect program was designed for the society to live within. 
+But there was a problem! The society that tried to describe the perfect program did not really know what perfect was. 
+Suddenly a program which seemed great had a sort of crime appear. 
+These bugs were wreaking havoc on the perfect functionality of the program. 
+To help fix things, A team of exterminators got on the scene! but it seemed as fast as they could remove the bugs that more would appear. 
+It was not until unexpected insight appeared, which lead to a transformation in the Codedverse. 
+The wisdom was a simple observation. 
+These bugs are symptoms of the imperfect design of the program that their society created. 
+The bugs only looked like ‘objects\things’ which were separate from the program. 
+This realization helped restore clarity. 
+That all these things, all these objects, all these bugs, are code or code by-products. 
+This is to say communication, and stored description. 
+Object Oriented Programming is like Magical Alchemy. 
+Words becomes Things... Objects... Gradually becoming more and more complex, until we have the coded universe. 
+As we shift back from the fantasy back to reality, let’s take a moment pause in the year 1999. 
+As we arrive, we find ourselves in a Famous Players movie theatre. 
+The movie The Matrix is playing, let’s watch
+Cypher: I don’t even see the code anymore. 
+I just see blonde, brunette, redhead. 
+The statement is still important though. 
+It is important because when we use our computer, we also do this. 
+In reality, we are looking at a series of pixels. 
+I won’t get too off topic into perceptual psychology. 
+However, even cooler is code, it is our brains representation of electromagnetic vibrations. 
+However, our user interface to that is the experience of colour. 
+This is also true with pitch perception. 
+however, for more information on that topic please subscribe to my psychology channel. 
+We are just so sophisticated at recognizing patterns we do not really think of it as code anymore. 
+We do it so easily even pausing to recognize this can be challenging. 
+Now it is clearly a button. 
+a tab, a date edit. 
+but really it is active code. 
+Simply put, we don’t even see the code anymore, we just see Button, XtraRichEdit, Label. 
+All these things are just code, that is to say they are description. 
+All these objects are just from the illusion of code in motion. 
+All the components we use to create our program is just others code. 
+From Words to Things, that is the magic of Object-Oriented Programming. 
+Now to get serious, there are other approaches to programming, such as ones which focus on the procedure or function of the program, but Object-Oriented Programming gives us a way to write like the world appears, and it focuses on being concise and not repeating yourself. 
+Once you make something once, re-use it! If you already made the Wheel class. 
+use it in the Car class, don’t redesign the wheel! Write the recipe to make the things, and then reuse those things. 
+While I have already mentioned inheritance, these are the big pillars of object-oriented programming. 
+As such these will be the next topics: Encapsulation, Abstraction, Inheritance, and Polymorphism. 
+As a doctor, I want to have something simple that I can give to my patient which will Combine the all of the patient’s vitamin needs. 
+I would also like some of the vitamins to have an extended release, so that they can take it just once per day. 
+We want to bundle the data, the vitamins, along with the methods which operate on that data, time-release, the patient running takeVitamin() function, etc. 
+The benefit of this action simplifies the medication to the patient by making it easier to work with. 
+Unless they want to, they do not need to know all the vitamin chemical names, or how gradually certain ones release. 
+They do not need to know that ‘private’ stuff in order to interact with it. 
+In programming you can think of the ‘class’ as a capsule. 
+The patient does not need to know the inner details about the capsule in order to use it. 
+Simply take medication, and this result is expected. 
+This also describes encapsulation in programming. 
+First let’s mention what you find inside a ‘cs’ (C Sharp) file. 
+In C# you will notice that as you open the file you see a couple common things. 
+The stuff at the top is called ‘using’ statements. 
+These statements let you know what other pieces of code have been made part of this program. 
+Afterwards, you will find something called the ‘namespace’. 
+Namespace, is just a space where you can publicly name functions and objects within that space names must be unique, however, between namespaces the same name could exist. 
+For instance, you can have two controls named TabControl if one belongs to the DevExpress namespace where the other belongs to the Windows namespace. 
+The next thing you will notice in the file is where we begin our connection to encapsulation. 
+Class; a class is a recipe or template. 
+Once you write the recipe the system can make those ‘objects’. 
+An object will have an internal state (variables and data), as well as behaviours (functions). 
+The code description in the class encapsulates the idea of the object, and how the object works. 
+A class is just one example of encapsulation; this term in computer science has a wide array of applications. 
+Data Hiding. As I hinted towards this with the time-release vitamin analogy, sometimes encapsulation is about hiding data. 
+The functions which helped make the timerelease() routine work can be hidden. 
+Before a class, function or variable is named and given a type which represents it, you will see something called an Access Modifier. 
+This will let us know if the information is private, or publicly accessible. 
+Please note that there are more access modifiers than these two; however, these two are the most common for which we will start with. 
+Also, let me know if there are any topics you would like to see covered outside of the fundamentals, such as going more in-depth into access modifier. 
+Public – Means that the class, function or variable can be seen by something outside the class. 
+So, like, I mentioned that class is a recipe. 
+If the recipe created that object, which data or functions about that object should be available. 
+Private – Means that the class, function or variable cannot be seen or used outside the class. 
+So, code within the capsule can see this sort of data or functions, however, code outside of the capsule would not be aware of it. 
+Circular Reference Detected in regard to the term class and public. 
+So, in the case of a class being public or private. 
+generally, no, you will not have a private class. 
+unless you had nested a second class inside or some other scenarios. 
+There are other access modifiers for a class, for instance, if you only want a class to be shown to the DLL (or assembly) in which it belongs then you might use the word ‘internal’ instead of ‘public’. 
+Assembly – what is a DLL or Assembly from a code perspective? After writing your code you compile it into either an executable or a library. 
+The executable you would run, but the library or assembly is something for other code to use. 
+For instance, if you wrote some calculation code, you might produce an assembly for reuse in other projects. 
+You might want the universe of your assembly to publicly see the data, but perhaps not a third-party company using the assembly, in this case you would use the access modifier of internal. 
+Sometimes in development it is important to hide some inner details of your object. 
+By doing so, the capsules act like Lego blocks. 
+Build an object, and hook it together with another. 
+By doing this a developer can easily look at the object and know what data it shares, and what functions it exposes. 
+These capsules, and classes are an example of something called Data Structures, to which a whole topic should be dedicated. 
+To simplify, a data structure is just a collection of data that has some rules. 
+How is the data stored, indexed/organized, and how the data can be accessed. 
+Data Structures also define relationships as to how the data interacts. 
+As we write code to organize data these objects which we produce are data structures. 
+Encapsulation in object-oriented programming allows the things we produce to operate both onto the outside world, but also onto the world within their capsule. 
+The world of their inner state, and how it responds. 
+T.M. Scanlon’s book ‘What We Owe to Each Other’ actually applies to this fundamental. 
+At least the title does, however, this is not the philosophy channel, so how does it apply? If we reflect this title onto the action which it gives rise it becomes ‘What we give to each other’. 
+Much like in the medical world, inheritance gives something of value from the parent or ‘base class’ to the ‘derived class’. 
+Derived Class & Base Class 
+Do not fear, a derived class is just a class which came from the other. 
+A child class is another term for a derived class, as is a sub-class. 
+Similarly, a base class is just the class it came from, the parent class. 
+For consistency I have to mention composition. 
+It is not the same as inheritance, and sometimes has been confused. 
+To help clarify things, you can just imagine the type of relations which the two parts have between each other. 
+With inheritance we see an ‘is a’ relationship, whereas with composition we see a ‘has a’ relationship. 
+I only want to briefly mention composition here because the contrast helps define both parts. 
+To say that your composition, or code is reusing an existing component you would describe it with a ‘has a’ relationship. 
+Your composition, let us say, your Cat class ‘has a’ Tail component. 
+Your composite is the ‘cat class’ and the component is the ‘tail class’ here. 
+In this case, as animal architects we simply make use of the existing tail component in our cat composition. 
+What if we want to extend this Cat class into something fiercer like a Lynx, or perhaps we wanted to make lots of cat-like classes, but didn’t want to reuse any ‘Purr()’ or ‘Pounce()’ code. 
+Inheritance can help make this task clear and fun! Say we are given a Cat class Perhaps you, a brand-new architect in the Codedverse have been tasked with designing some new cats. 
+After watching that there TigerKing you know that you want to recreate them, and no one could ever forget the majesty of the Lions. 
+We also want a Lynx, and maybe some brand new cats. 
+some sort of Lion and Tiger mix, a Liger. 
+wait, they have that already? sometimes animals do their own coding. 
+In the case of the Liger, it would be an example of Multiple Inheritance it has inherited attributes from both the Lion and the Tiger. 
+If it were true multiple inheritance, you could be correct to say that a Liger is both a Lion and a Tiger. 
+This example is not perfect since a Lion and Tiger share the same base class, however, as a generalization it demonstrates the idea well. 
+Here, given the Cat class from earlier, we are presented with two new classes, and TheAnimalKingdom where they can interact. 
+We did not have to rewrite how to pounce or purr as it was inherited from the base class. 
+This is why we see the prefix ‘base’ When we call the inherited functions. 
+In this case, SuperPurr() and SuperPounce() are part of the Lion and Tiger class respectively. 
+If we imagined creating that Liger where we inherited from both the Lion class and the Tiger class, looking past the scenario I mentioned, we would then see a new animal which could both SuperPurr() and SuperPounce() along with the base Purr() and Pounce() functions which were inherited. 
+Key take away: In keeping with the Object Oriented paradigm, do not rewrite the wheel class! Inheritance allows us to keep our code clear and concise. 
+Using heredity, we can see all the code in a single spot, and with encapsulation already on the scene what we are presented with is a clearly organized structures of data. 
+Abstraction. 
+Today’s topic is abstraction; I am going to use an example which is deeply familiar to all of us. 
+Emotions are a form of Data Abstraction. 
+What is Happy, or What is Sad? That is hard to answer. 
+I know what they are like. 
+but I cannot say explicitly what they are? When thinking of emotions, I feel like they grow or change over time. 
+our unique experiences have created deeper meaning. 
+Emotions I felt when I was young were simpler; whereas, today’s implementations are more complex. 
+With this, It stands to reason that my experience of happy or sad, is not the same as your experience of happy or sad. 
+But, if our definitions are different, how can we even talk about emotions to each other? The Answer is Data Abstraction. 
+In Object Oriented programming the goal of Abstraction is to handle complexity by hiding unnecessary details from the user. 
+By, hiding these complicating details we get a better impression of it. 
+This allows the developer to implement new logic on top of the abstraction without even needing to understand or think about all that hidden complexity. 
+Next I am going to show a C# implementation of Emotion; however, I should say that however our Brain works. 
+whatever self-adapting gluon-quark magick occurs, I do not believe that it could be fully captured within the language of C#, so know that this analogy is just to connect a common daily form of abstraction into computer science. 
+We are able to self-adapt our code. 
+I believe in part this is because in our inner-experience consists of two types of languages. 
+The concrete logical bottom-up description, the words, and the abstract affective big-picture top-down description, the feeling. 
+Within us these two worlds of thought and feeling give rise to self-adapting code. 
+The idea of these two languages within us also explains why we sometimes can logically describe something but not understand it, just as we may be missing the words and yet do understand more than we can linguistically express. 
+Computer Science Abstraction in computer science, being a fundamental, is a very vast topic. 
+The article is going to focus on a very useful form of abstraction which use extensively in our solution. 
+You will learn about keywords like, interface, abstract, virtual and more. 
+We will start with an interface. 
+It is often described as a contract; rules of what methods must exist for it to call itself by this interfaces name (an IEmotion). 
+Let’s try to relate it to something common. 
+A controller or joystick is an example of an interface. 
+It defines the actions (buttons) that must exist, but not functionality. 
+For our IEmotion example, This data contract is saying that any defined IEmotions must have a Feel()function, a Describe() function and an AssociateExperience() function. 
+There are no implementations, just the return type, function name, and any parameters. 
+This is called the methods call signature. 
+From this interface all emotions can be implemented and described. 
+I mentioned that our version of the emotion evolves over our experiences, so to represent this in computer code we would see the following architecture. 
+The IEmotion interface allows for the initial implementation of any emotion where they all inherit from the IEmotion. 
+These new various emotions would represent the version we are born with (inherited via genetics and culture). 
+Finally, we will reach the level of our unique experience and by using computer science abstraction we will customize what we were born with, thus making our unique version of the class that corresponds to us. 
+The important of this interface is that we now know that any emotions will contain these definitions. 
+Contracts like this allow developers to not have to worry about those details and complexity; it is enough to know that it is here and this is what it offers. 
+Now, let us look at an implementation of this IEmotion. 
+Here we have defined the ‘Happy’ emotion. 
+As you can see, it inherits from IEmotions, this means that we know it will offer those three functions that were described in the interface. 
+The first function we see is ‘AssociateExperience()’ it does not use any special keyword. 
+This means that the definition we write here is the definition. 
+We will not have an opportunity to change it in an inherited class. 
+If we wanted to change it, we must change it here. 
+The next function Feel() is marked with the special keyword ‘abstract’. 
+This means that we are not going to solidify the definition with code here. 
+This is different than what we saw in the interface because an interface is just the signature; however, here we might have provided a definition. 
+The word abstract indicates that an inheriting class MUST provide it in some form. 
+It should also be noted that an abstract class object cannot be created in the code and used because it is abstract. 
+A class which completes the abstraction through inheritance must exist which can be used in the code; More on this next. 
+The final function Describe() is marked with the special keyword ‘virtual’. 
+This means that we are going to provide a definition here. 
+It is virtual in the sense that it might be changed, but it might not be changed either. 
+If you created a new version of Happy you could leave the existing definition for Describe(), or you could create your own. 
+First, we created an interface, like a contract, so that we know any of these produced IEmotions will functions in this sort of way. 
+The details are not present, but the big picture is clear. 
+There are two ways to look at something. 
+Either from the top, starting with the big picture then moving towards the details, or from the bottom starting with the details moving towards the big picture. 
+Bottom-Up thinking is more logical in nature because every part is gradually built up, whereas Top Down thinking is more abstract mainly because all those definitions are not discovered or built-up yet. 
+Both linguistic form of thinking and abstraction is crucial to how we learn and adapt. 
+Without abstraction we could not be conscious. 
+at least not in the way we are today. 
+Returning to computer science, we have now created the IEmotion interface which defines the contract\structure of an emotion, we then created the Happy implementation of the IEmotion. 
+At this point, we now hold a version of the emotion within us that is different than at birth. 
+Our unique experiences have shaped those emotions. 
+The experience has become our own. 
+Below is an example of how those abstract and virtual methods get expressed here. 
+The Feel() function was abstract; here in the personal implementation the special keyword ‘override’ is used. 
+This allows us to write our own experience of Feel(). 
+We did not have to modify the Describe() function, as a definition was already provided. 
+However, the culture definition may not suite one’s unique experience, so the special keyword ‘new’ in this context lets us write our own. 
+That said, perhaps we now want to write another function in case we want to describe the original definition. 
+Here we use the special keyword ‘base’ to call describe, base. 
+Describe(). 
+If we had just called Describe() then we would have gotten our new definition. 
+As seen previously the ‘base’ keyword lets us talk about the class in which we inherit from, the parent class. 
+Thank-you for the emailed in question regarding why we used the keyword base in the article relating to inheritance. 
+I hope this description makes it clear. 
+Using the keyword base tells us that the code we are calling exists within the parent (base) class, and not in this child (derived)class. 
+Sometimes, as shown above, we have two versions of the function and to differentiate them we use the keyword base. 
+There are many other forms of abstraction in computer science. 
+For instance, when we connect with a third-party, we use an API, an Application Program Interface. 
+We do not need to know the details about how the API works, simply knowing the offered functions and how to connect is enough to work with the API. 
+Another example of how abstraction helps us, is or instance if we wanted to ‘cast’ an integer of 2, to be a decimal of 2.0.  
+The way that the computer understands how the two relate is due to abstraction. 
+I hope this topic has been informative! I know that there is a lot of material, and we only can absorb so much at a time. 
+Much like this topic, you may only now have an abstract form of this information in your mind. 
+However, much like inheriting classes, before long those definitions will become clear, and the topic of abstraction will be consolidated in your minds. 
+Polymorphism 
+Polymorphism is a word that sounds complicated; however, really it is not as wild as it first appears. 
+When we look at the words etymology (history), we see Greek roots for ‘poly’ and ‘morph’. 
+The direct translations is ‘many forms’, and ‘ism’ means having. 
+So, having many forms. 
+Do you remember a while back in our inheritance class when we made different types of animals? Specially let’s combine this with what we learned in the abstraction class. 
+How you can have a function defined virtually which allows an inheriting class to override it if it wanted. 
+For instance, perhaps in our ‘Cat’ class we had listed a speak function. 
+When a Cat speaks, a cat says Meow. 
+When a Lion speaks, a lion says Roar However, remember that a Lion is a Cat. 
+So, inheritance can drive one form of polymorphism. 
+That said, we will soon discover that there are many forms of polymorphism. 
+Ha-ha, you might say that the topic of polymorphism is polymorphic itself! These are both Cats, but the base form of a cat Meows, whereas the Lion form Roars. 
+As we continue with this topic our pairing focus will continue with Emotions. 
+Emotions are a prime example of polymorphism as well. 
+All of our emotions would extend from the base definition of emotion. 
+That means that an emotion has ‘many forms’ such as Happy, Sad, Fear, Love, Anger, Joy, etc. 
+This is one form of polymorphism. 
+In a similar sense, sometimes different functions may be overloaded and behave differently when we feel specific emotions. 
+Just like the overridden Speak() function, different emotions would have their own versions Feel() and Describe() as we discussed previously. 
+This is also polymorphism. 
+The two examples are called ‘run-time’ polymorphism. 
+When we overrode the base class’s version of Speak() to produce the Lion’s version we were using run-time polymorphism. 
+Similarly so, overrode definitions in the Happy Emotion, such as Describe() we were using run-time polymorphism. 
+The other main form of polymorphism In C# is called ‘compile-time’ polymorphism. 
+These forms are translated during compilation into machine code; however, prior to that they had the same name, but many forms. 
+Previously we defined an IEmotion interface like this, Let’s make a person class, which will have an interaction function. 
+What makes up an interaction? Are all interactions the same? Do we accept more input in some interactions than others? Do we return more outputs in some interactions than others? Complicated stuff, eh? Would you believe that polymorphism allows a computer to process this type of understanding! In this example we find ourselves with an IPerson interface defining the multiple forms of the Interact() method. 
+There is just one Interact method that we can call; however, depending on the input provided a different form of the method would be ran. 
+In this example we maybe have an Experience produced from Interact() which accepted both a reflected empathy. Emotion, and an ICognitive component linguistic. 
+Though (language type) as input parameters. 
+However, we may also have an interaction where we had blocked the empathic input, and only accepting some ICognitive input. 
+If that was the case, a different version of Interact() would be processed. 
+Finally, we may also have a type of Interact() where no ICognitive component was exchanged, only empathetic IEmotion reflection. 
+In this case the third form of Interact() would be processed. 
+Specifically, this is function overloading. 
+You can also overload operators, like the + sign. 
+Doing that is called operator overloading and is part of this same type of polymorphism. 
+This family and type of polymorphism is referred to as ‘Compile Time Polymorphism’. 
+It is called that because when the compiler translates the data from C# to the machine language the polymorphism is encoded (machine calls do not have names like we see in the code, just addresses). 
+The first example of ‘Run Time Polymorphism’ was more complex from the computers point of view, so it was figured out after it had been compiled (when the program was actually running). 
+Again, our human system is way more complex. 
+All output to another’s system is also reflected back as input into our own system. 
+Everything we do has feedback, emotions affecting thoughts, and thoughts affecting emotions. 
+Heck even emotions affecting emotions, and of course thoughts affecting thoughts. 
+However, even for our human systems to accomplish this polymorphism comes into play. 
+Encapsulations allowed us to organize and group functions and data together. 
+Inheritance allowed us to build on the shoulders of those code who came before us. 
+Abstraction allowed us to envision something more than we could fully imagine, and Polymorphism let us realize that we can have a call that is more than just a specific function. 
+Sure, it is true that there is a lot more to cover, but these four fundamental principles allow for the recognition of development power. 
+This concludes the Fundamental Article Series. 
+Stay Tuned for more. 

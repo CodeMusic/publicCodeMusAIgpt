@@ -1,0 +1,465 @@
+HOW IS DBSYNC LIKE BITCOIN
+Our old replication model subscribed to a central publisher called hives, and all replication called subscribers had to be routed through central. 
+In our new replication model, every node is its own publisher and subscriber... meaning there no longer is centralization. 
+While we do have a central for specialized function, everything now runs on a decentralized network via Microsoft Azure Service Bus Technology.
+Decentralized just means that it does not have to rely on Central
+Several years ago the replication model looked very different.
+Messages were not sent directly from clinic to clinic, before they relied on a central body. 
+In some ways this reliance on central created a single point of failure.
+This centralization created some issues because if central was down, everything was down!
+With no future updates being supported we had to take matters into our own hands, and produce the solution that we wanted to see. 
+With the help of a team of developers from Romania, we produced a minimum viable product (MVP).
+From that we have enhanced it into a pretty cool piece of technology. 
+But, if it is Decentralized Why is there a CENTRAL? 
+Good Question Bart! 
+In terms of basic replication function there is no difference between central and a clinic. 
+Keeping with my ‘fleet of buses’ analogy, whenever data is modified (anywhere), you could imagine a fleet of buses driving to all the other nodes to deliver that data. 
+The only reason that we still have a central is because we wanted to add some other features, like health-checks or notification reporting. 
+These features need to know if it is a clinic. 
+One more important reason for having a ‘central’ still, is it lets us know that in every case, if it is marked as central, receive all of the data! 
+A BLOB is a Binary Large Object.
+Partial Replication is the process where received data is only stored if the associated patient has had a visit or appointment at the location.
+A Topic is used to separate communication between different services buses.
+A Container is used to separate data for blob storage. 
+Non-Convergence is when two sets of data no longer match, the clinic has a variant of the data which is not complete. 
+Dashboard is a central site used for checking health and performing basic actions.
+A pipe is the two pieces of software DbSyncService and DbSyncMonitor communicate via something called named pipes. 
+It just is a method for two programs to chat. 
+Both replication models work the same until the last step. 
+In either case data gets changed somewhere, and away it goes on the bus heading for the destination. 
+The difference is what happens when the data gets off the bus. 
+The Full Replication lets all the data off the bus, however, with Partial Replication before the data gets off the bus it checks to see if the data belongs. 
+The Vision to the left is like a fully replicated clinic, whereas, the vision to the right is more like a new (blank) partially replicated clinic. 
+But, How Does IT KNOW? 
+We will go over all the settings after these slides, however, first to know if a clinic should receive everything (full) or just some stuff (partial) we consult the Location Specific setting. 
+But, this is only part of the answer. Some tables we always want to always replicate, even if it is a partial replication hive. 
+For this we have a very important table called SyncReplicationTables. 
+In this table you will find replication meta-data, or Data about the Data. 
+Each row in this table describes how a specific table will behave. 
+Any codes can be looked up via the Categories and Category_Item tables. 
+The column ReplicationType indicates how the table should share its data. 
+0 = Always Replicate,  1 = Partially Replicate, 2 = Never Replicate, 3 = Optionally Partially Replicate. 
+When we partially replicate we need to know the patient, otherwise we do not know if the data belongs. 
+This means with ‘1 = Partially Replicate’ that if the patient id cannot be found, an error occurs... 
+if we use ‘3 = Optionally Partially Replicate’ it will try to find the patient id, but if it cannot (and it is null) it will replicate it anyway. 
+Merge Replication, Subscribers, and Publishers... OH MY!! 
+These are legacy terms from the old world. 
+In a centralized world, central was the publisher, and the clinics were the subscribers. 
+Thankfully we now live in a more-or-less decentralized world. 
+So, free your mind from these old terms, for this is a Brave New World! 
+In the manual it is said that ‘DbSync Replicates Instantaneously per Transaction’, what this means is that after you change the data, the changes goes out to all the nodes directly. I am going to be using the word node to denote either a clinic or central. In the old world, things had to route through Mordor Central before the data would reach the clinics. 
+Stay in your lane MRS. Frizzle! 
+With all these buses how do we make sure the data goes to the right clients (hives)? 
+The answer here is a term known as a ‘Topic’. 
+Imagine a Topic as a road system. 
+As long as our clinics are set to the right topic (road system) only those buses and their data will reach the particular client (hive).
+One point the manual which caused some confusion was the note about ‘three clinics (C1, C2, C3) who share a topic, and one of the clinic wanted to change the topic’. 
+To clarify this, let’s stick to your road system metaphor. 
+If clinic one started using a new road… that message (the decision to use a new road) would never reach the other clinics because they are still listening and hooked up to the old road system. 
+As a result, a topic change much be done at all nodes manually in order to change a topic.
+Waiting at the Bus Stop. 
+We cannot escape lines in our day-to-day life, well, except for the last year and a half I suppose.
+The service bus is no different! 
+DbSync add a MS SQL trigger. Triggers are neat, and in our case, on data changes, we run some database code that results in the change being stored for Service Bus departure. 
+The table called: SyncMsgQueue gets these changes for any data changed by almost any sql user. 
+There are two exceptions to this...
+Sql User:  ‘chssync’, this special user will not cause any trigger to run, so nothing gets to the bus stop, and no replication occurs (we use this to allow us to apply a received message without accidentally resending). 
+It is also useful for debugging and support if they do not want a change to replicate.
+Express User:  ‘chssyncexpress’, this user behaves like any other replicating user, except it does not put its messages into the table ‘SyncMsgQueue’... it puts them into ‘SyncMsgExpressQueue’ which his used for the express bus (which we will discuss later). 
+Blob Storage (Binary Large Object) 
+The service bus only permits 5GB of data to ride. 
+This poses a limit on how much data we can put on a bus. 
+To help offset this limit any data larger than the system settings ‘DBSync.SyncStorage.MinBlobSize_Bytes’ value of data.
+For a given row of data-change, any field with more than 1kb of data, instead gets uploaded to BLOB Storage, and the data in the message gets replaced with an identifier. 
+When the message is received the data is fetched from storage and the id in the message gets replaced back with the data. 
+Just as a service bus used a topic to keep other clients data separate, BLOB Storage uses a ‘Container’.
+A container would be associated to a client\hive. 
+This ensures that only data from that hive is uploaded or downloaded. 
+Strings and Keys, Connection strings and Keys THAT IS!
+On top of service buses having a topic, and blob storage having a container, they also both have connection strings. 
+For our use case, we have one for A.M.G. and one for the rest of C.H.S. 
+We mainly separated this for organizational and management purposes. 
+For either the service bus, or the storage account the connection strings contain a key. 
+Azure gives two keys, and thus two connection strings. 
+At any point if one feels that a key has been accessed we are able to regenerate the keys. 
+Doing this will make the old ones stop working; this is mainly done for security reasons.
+In the next slide, I will show where you can find this within the Azure Portal.
+I am only going to show basic functionality here. 
+While the app will just work, setting the "EMR_Master" connectionString will decode the clinics from IDs to friendly names.
+When you open the support tool you can run a ‘Full Support Report’, however, most others would use the left side controls. 
+Start by selecting a ‘bus’ from the drop down.
+If after you do this, you do not see the tree of data you may need to either reside the window... or pull the log panel down.
+After wards you should be able to see the full tree. 
+There are three types of service buses, which I will go into more detail shortly. 
+That said, the purpose of this tool, they all work the same. 
+Since we have not covered Monitor or the Express Bus yet, we will focus on the ‘Core DbSync Replication’ topic.
+Expanding the list, will show a list of clinics, including their message counts. 
+Do not worry about ‘Dead Letter Messages’, they are scenarios where a message had been tried the maximum amount of times, which is controlled by this system setting ‘DBSync.SyncBus.MaxDeliveryCount’. 
+These are messages that our system has decided to abandon.
+The part of value is the ‘Active Messages’. 
+These are messages that have left the originating node, but have not arrived (been downloaded) to the destination node. 
+This tool has a lot more features, however, this covers what we will need to know in order to debug some error scenarios. 
+We have mainly focused on core replication topic; however, there are two others. 
+Monitor: DbSync Monitor is aware if it is a clinic or central. 
+If we are a clinic, then every so often a heartbeat will occur. This is just what we call the health check which is sent to central. 
+It includes the DbSync version, and most importantly a timestamp stating when the heartbeat occurred. 
+Also, if database error occurs, we send the error as a notification message. 
+This brings us to monitor running on a central location. 
+The difference here is that central will not send health checks or notifications, instead it receives them and writes them to the EMR_Master database tables, such as DbSyncNotifications or DbSyncNodeStatus.
+Lastly we have the Express Bus, this bus, is basically just a second replication bus, just like the core one.
+We use it like a Canada Wonderland Skip the Line Pass... or maybe a better analogy is that regular replication is like UberPool. 
+You got to wait for the other messages to get off the bus before you can.
+Using the ExpressBus is like using UberX, or some other premium service that ensures your
+messages get on the VIP Bus, and not just the bus that all the normal data (like SpongeBob) rides. 
+The ExpressBus is new and is not mentioned in the DbSync documentation. 
+We would sometimes see that when patients made appointments through Patient Portal or Virtual Care(Insig), as providers we wouldn't see those appointments being replicated in the clinic schedules in the EMR. 
+With Virtual Care(Insig) being a third party, both for security and to make it simple, all their communication goes their our EMR WebAPI. 
+Much like Patient Portal, these connect to our central database. 
+I mention this because it means it is not direct. 
+Due to this extra step data we there are a few things which could happen: 
+If the clinic was a partial replication clinic, if the appointment data may have been skipped, but, presuming the data was meant to be there.
+A migration/data import/or other large volume task may have put too much work into the queue which would slow it down. 
+There could be a replication issue, which I will discuss resolving next. 
+Supporting a Replications Issue: The Basics 
+Has the message got on the bus? 
+If you query the count(1) of SyncMsgQueue WHERE status = 0 and the as you re-run it, if the number does not go down there maybe be an issue. 
+As mentioned previously, the DbSync Support Tool will can show you how many messages are still on the bus. 
+If this number is not going down, that it suggests that the clinics dbsync is not talking to Azure. 
+A common solution to this could be as simple as restarting DbSync, which is quick at the clinic, but at central starting it will take over an hours to activate all the clients again.
+Non-convergence happens when some messages do not make it to the destination. 
+When this occurs the data at the clinic is kinda like a Loki variant. 
+It does not reflect the data on the ‘sacred’ (central) database. 
+When this happens we do not ‘prune’ or remove the old data, instead we try to find an apply the missing data. 
+The most common way this can happen is if a message tried to be applied but a SQL error prevented it from getting added. Often times when on messages fails , many others will too. 
+This topic we will have to have a second-workshop as to all the reasons this can happen. 
+What sums it up is that some message didn’t arrive, or some linking data was not there but was needed to be there for the new message to apply. 
+This contains the actual DbSync program. 
+It gets added to our updates database table, and is used to update dbsync automatically or manually. 
+If the automated install does not work, on the next slide we will show how to manually installed it via a command line. 
+It is suggested you back up and reuse the existing app.config files. 
+Due to the amount of content, I have only highlighted some key settings. 
+Due to time limits we will focus here on reviewing the DbSync specific app settings. 
+The config has a section which is only use if it is central, and another section for if it is the clinic. 
+Bundling
+A message has a basic format, so sending a lot of small messages wastes space. 
+Bundling allows us to send as many messages that will fit into a single transmission. 
+After we receive a bundled message, we expand it into all the original messages. 
+The concept here is just like Zipping up a file before emailing it, so that more data can fit.
+Disregard any mention of FDDB as this is old functionality that we do not need anymore. 
+Vigilance has allowed us to overcome this obstacle. 
+Dashboard is a website we created that is able to show us any notifications which came from a clinic. 
+We can see the last time a clinic interacted with dbsync. 
+And we can even send commands to start or stop a now. 
+Our current implementation has an issue with running as central. 
+This has temporarily prevented us from using central features like dashboard. 
+This will be covered more in a follow up workshop, along with a demo. 
+The BadImageFormatException is a spooky sounding exception, but what does 'bad image format' really mean? 
+Is there a Good Image and a Bad Image that are duking it out? 
+What Bad Image Format means here is actually more akin to saying that the compiler became confused when it was presented with something it did not expect. 
+Architecture, the compiler became confused about the expected architecture. 
+See, there is a middle phase between the code that we write, and it running on machine hardware. 
+The code does not just go from C# to Binary, there is an intermediate language. 
+This language allows for portability, and general understanding between computer chips. 
+See a computer chip has a series of inputs and a series of output. 
+These inputs are 1’s or 0’s, just as the outputs are 1’s or 0’s. 
+A 32 bit chip allow for a series of 32 1’s or 0’s for referencing computational values such as memory addresses. 
+So, an instruction may say 1001110011101110011, which would have meaning to the chip itself. 
+It may mean ‘1001 = commit the following data’ ‘that resides in this RAM address: 1100111011’ to register ‘0011’. 
+Note: a register is like a placeholder on the chip. 
+The first instruction may load data to the first placeholder, a register, the next instruction may load data into the second placeholder, a register, and the third instruction may say ‘add register1 and register2 together and store it into register3’. 
+Finally, another instruction may instruct the chip to store that results from register3 back to RAM or perhaps to the hard-disk. 
+The meaning that the code has to the chip is unique. 
+A 32bit chip and a 64bit chip cannot understand each other’s code. 
+The system would warn about this by throwing a BadImageFormatException.
+Without stumbling on the nuances of .NET and the Common Language Runtime. 
+Let’s simplify talking about Assembly code.
+C# Code:
+Var x = LoadData1()
+var y = LoadData2()
+Var z = x + y
+SaveResults(z)
+This may translate to the following Assembly Code:
+1: MOVL 0xFF001001 %eax
+2: MOVL 0xFE001001 %eay
+3: ADDL %eax %eay
+4: MOVL RESULT, 0xFA001001
+This reads:
+1: Move the data which resides at hexadecimal position 0xFF001001 to the register labeled %eax. 
+2: Move the data which resides at hexadecimal position 0xFE001001 to the register labeled %eay. 
+3: Add the values loaded in the register labeled %eax with the value loaded in register %eay
+4: Move the data stored in the special result register into RAM residing at 0XFA001001.
+PS: they just use hexadecimal to allow showing more data with less screen space. 
+A bunch of 1’s and 0’s is tricky to read, but as soon as you introduce degrees of data understanding it becomes manageable. 
+Things like MOVL really are just codes (symbols) for what it means to the chip. 
+Remember to the machine it is all just 1’s and 0’s, but humans have a powerful associative brain. 
+Sometimes it is so powerful that we forget we are even going it; I suppose all power like electricity could be considered both a blessing and a curse. 
+However, when harnessed... well, look around… it is all a result of this. 
+Our perceptual system is literally all about code!
+We just are so use to the code we sometimes we don’t see it, however, from that we get things like colour, pitch, and other brain-encoded representations of data. 
+Returning from this beautiful tangent, MOVL is just some letters that represent something meaningful. 
+Such as the code for the chips multiplexing address space. 
+A multiplexer is a logic gates circuit that fetches a bit of data from computer memory at a given address. 
+You build a multiplexer, like all logic gates from transistors. 
+I like thinking about light, so I would visualize a multiplexer like a set of mirrors. 
+For instance, for data at 10101010000000000001000000000001 the mirror would point at the first entry and the reflected light would shine that data onto the register. 
+It literally works like this but with electrons instead of photons. 
+Say you wanted to work with the data locally at register %eao, well the assembly code would read. 
+MOVL  0xAA001001 %eao
+MOVL represents the code to engage the chips multiplexer. 
+To different chips the symbol MOVL may mean different things in terms the binary form. 
+Aside: Talking in terms of hardware, chips have metal pins. 
+When we send fluctuations of data such as a low voltage, or high voltage we are able to encode binary through electricity. 
+We use the terms on or off, but it never really is off. 
+Off in terms of the chip is a low voltage, On in terms of the chip is a high voltage. 
+This way even if the signal is off, it still is communicating a heartbeat, but in a more subtle way. 
+When it compiles to machine language all of the assembly code becomes binary. 
+We need an intermediate language because the programs binary code is meant for a specific chip. 
+The intermediate language lets us compile to something common, giving us assurance that request is received in the same way as it was intended. 
+Of course, big difference between 64bit chips and 32bit chips is the number of bits that it can work with. 
+So, when you see the BadImageFormatException, it means that different components were compiled for different types of chips architecture.
+The components cannot correctly mesh until they are on the same architecture.
+Luckily now is the age of software, so the resolution is within reach. 
+Resolving this type of exception is usually straight forward, except for when it isn’t, and even then, it is but just different. 
+If you are referencing a DLL (assembly) that was compiled for one architecture, in a project configured for a different architecture. Adding a project reference instead of a direct assembly (DLL) reference would resolve this issue. 
+It would resolve this issue because when compiled the project would automatically be compiled into the selected architecture. 
+If it still happens, it might mean that one of the projects in your solution was not compiled with the same configuration as another. 
+For instance, if you have an x86 project and a x64 project that might cause it. 
+Adjusting the configuration would resolve this error case. 
+The other cases could be if you are running a web-application like Patient Portal but your Application Pools architecture is mismatched. Even here the solution is simple. Just open IIS, go to Application Pool, right click the affected application pool, click advanced properties, and notice the ‘Enable 32-bit applications’ property. 
+If this is set to true then it will only support 32-bit application, just as if it is set to false it will only support 64-bit applications. 
+There are other cases too, like the IIS Express emulation bitness being mismatched, or a VDPROJ setup project configuration not matching the desired project output. 
+In all cases, the common solution is figuring out how you want your solutions build, and ensuring the relating components reflect the same configuration. 
+Lioness Basketball
+This Assignment is designed to grow gradually, so it will have multiple programming lessons and related tasks.
+Each task will work with a programming component. 
+First a short description of what the component is and what it does will be described. 
+Then practical experience to make use of the component. 
+I have already started talking about something which I have not described, a component.
+I mean though, a component of what, and what is it made of? 
+More in depth topics will follow, and then you first will have a short reading assignment.
+This first such topic is Object Oriented Programming. 
+After you read that topic, the below will seem less fantastic. 
+That is the cost of learning whats under the hood; however, I think we are past that.
+We are going to build a game called 'Lioness Basketball'. 
+All details of this assignment I want you to adapt with your feedback. 
+This will start gradually, but has to potentially to be fantastic. 
+It will allow for two players, or single player. 
+To connect online, two people would provide their IP addresses, and the two instance of the application will link up. 
+That will be a small chat window allow typed communication. 
+Each player will be represented by one of two colours, and there will also be single player game mode which allow other types of game play. 
+Lioness Basketball will keep track of both persons stats. 
+People can have a profile so they can enjoy either colour, challenge others, and all the while still have their high scores tracked! 
+But the full project does sound sounds pretty fantastic so far eh, pretty difficult? 
+My first piece of advice is to drop the word difficult from your vocabulary, if it was there. 
+Try to think in terms of things as familiar, and unfamiliar. 
+When something is unfamiliar, it can be more unpredictable, and that makes it 'difficult'.
+Once practiced, and it becomes familiar, that unpredictable becomes more fun, and less difficult. 
+Of course challenge is an important part, luckily these topics are dynamic and always growing, so challenge will be there, all that will happen is your skills get better. 
+From some personal experience with learning music, if the right amount of fun can be introduced, and the right amount of challenge too, then learning becomes effortless! 
+I believe this is true for any topic! 
+Which is why bidirectional feedback is so important. 
+Once great thing about coding, is once you get going on a project you like, it takes on a life of its own. 
+Which is why any game mechanics, plot points, or anything about the game is yours to adjust. 
+After this assignment, I want you to have something that you created, something that, while at the beginning seemed too fantastic, is real, and is yours. 
+I will wait to describe the game mechanics, because I have to expose the illusion of object oriented programming first. 
+Project EpiGen Outline 
+The two main issues are not enough context information when bugs are reported, and no transparency into how clinics use the software which results in flows we may not have fully evaluated. 
+Adding Automated-Context-Information to Exceptions. 
+The first issue regards errors from production. 
+Often times only the bug pop only provides a stack trace, and this is usually less than helpful. 
+If we had a way to add context to these exceptions developers would be able to resolve the issue much more rapidly. 
+One form of context may just be a video clip of the last five minutes of activity. 
+Other context could be a historical stack of which modules or controls had been interacted with.
+Automatically Identify Workflows
+Often times the way that the clinic staff uses the software is not the same as how QA and Developers
+use the software. As such, some issues may fall through the cracks and reach production, simply
+because C.H.S. was not intimate with the workflows that occur in the clinic.
+As pointed out by Garen, the AI would need to consider multiple factors and classify the workflows
+with specific groupings. 
+For instance, it was mentioned that younger doctor’s use the software very differently than older doctors. 
+This would be a similar case where staff of specific roles would use the software in their own specific ways. 
+Another challenge which was pointed out, is that a work flow is not just from visit start to visit end, there are a lot of moving parts, such as the MA’s interactions. In programming there is a data-structure called a ‘Linked List’, perhaps if we identify each part
+separately then provide links, we would be better able to handle this complexity. 
+Are we allowed to capture the screen’s activity at a clinic… or do we have to censor it in some way? 
+DbSync uses a feature called ‘Named Pipes’, this allows two programs to talk to each other. 
+We would borrow this concept and give our software an open channel. 
+This new EpiGen program would run above the code. It would be able to send or receive messages through the pipe. 
+For instance, if background recording is occurring and the software reports an exception. 
+The exception would get passed through the named pipe, and a five-minute video clip would be included along with the exception information. 
+Good Evening Kelly and Rick, I felt compelled to share this testimonial. 
+As the team lead, I feel it is both appropriate and important for me to share this feedback before we
+have the performance reviews. 
+This is simply my professional input from my observations over the last year. 
+While I have never written a testimonial before, I do feel it is important to recognize talent explicitly when it is warranted, especially considering that employees like this do not often join our team. 
+Rick, I remember when I first started you talked about these rare super-stars, that do not often appear, but when they do, they should be recognized. Especially now-a-days it is hard to find employees that are dedicated to the company, and consistently go the extra mile. 
+Everything I am about to note, I am sure that you, both Kelly and Rick, have already recognized.
+I am referring to our latest employee Anna Sushchevskaya, who joined us from Appletree. 
+The initiative, dedication, and leaderships that she has demonstrated is notable. 
+This goes beyond initial clinic experience, reaching into areas of leadership, and aptitude. 
+Taking the lead on the Blob Migration project, identifying the exact code issues just through testing, such as the fax and blob storage container having a shared cache demonstrates remarkable ability. 
+She has also been continually learning software development, with a focus on the web-technologies that are in our companies road-map, and she is studying for certifications. 
+By taking a look at work items and test case details, the extra time she puts in, and how invested she gets in her work, I am confident that she is an evolving super-star, and should be recognized as such. 
+With performance review nearing, I wanted to express that she is an employee that we want to keep on our team. Being aware Inflation this year, and living expenses is of course a factor, but her talent and accomplishments is where the focus of this testimonial resides. 
+I certainly hope I am not overstepping, and I only mention it because I recognize a lot of parallels from when I started, and want to express the factors which helped me push forward. 
+After the first year of really demonstrating my abilities, I was not only recognized in my review as an evolving super-star, but I was also given a compensation bump in recognition of how much effort I had demonstrated. 
+These acts helped me maintain my momentum to be the best that I could be at C.H.S., and I really feel that it would have the same effect here. 
+Of course our entire team works very hard, an inflation does affect all of us. I think I heard quoted that
+this year inflation was over 7%, which is insane. 
+I know C.H.S. is doing well, and that C.H.S. takes good care of our entire team. 
+It is also just as important that when new employees join that show dedication to their work, incentive to learn, and willingness to be more at the company, that they are recognized in some fashion. 
+From my experience, it really made the world to me during my first performance review when I was told how much I was rocking it, and that the company saw the spark in me, and that they wanted to help develop it further.
+I am confident that this sort of recognition towards our latest team member would reward hard work, and result in continued dedication and development within the company. 
+Kelly, I know that you would already be well aware of everything I have said here, as would you be Rick. 
+Still, I wanted to explicitly communicate that I also have recognized this aptitude, and thorough 
+understanding of our software within Anna Sushchevskaya and feel that she should be recognized. 
+Thank-you for taking the time to read and review this testimonial. 
+This is my professional opinion, and I feel that you both would fully agree with the content that has been expressed here.
+Thank-you again,
+Sincerely,
+Christopher Hicks. 
+The Exotic Mysteries of the Then New Architecture.
+What is it? 
+The then new architecture gave us a web-wise database aware solution which LLBL could not provide. 
+It was written in house, and allows us to limit fetches or extend fetches based upon our needs, all with the single type of the keyboard. 
+How does it work? It works well. 
+It also works through a template where the system populates keywords with content. 
+The magic makes use of recursion, like most magic does, allowing for a simple template to become anything we desire to imagine. 
+I recommend building the solution, and running the exe from the binary if you are going to be
+regenerating a lot of code. 
+With the debugger attached it takes exponentially longer as the workload increases. 
+For this guide we will focus on a change to the pt_appointments table. 
+Ensure the changes are present within the database before continuing. 
+If you are using the solution, set your start up project to the ScaffoldingApp. 
+Update the ScaffoldingApp’s App.config to match your configuration. 
+Compile and Run the Binary for large changes, or run the solution for small changes. 
+When you launch the project you will see that everything is populated with your desired values. 
+For the first phase we will want to refresh the schema by scanning the database. 
+To do this, click the [ Refresh Schema ] button, found to the left below the list of tables. 
+After the refresh is complete, scroll through the list and select the table(s) you wish to update.
+This is a multi-select listbox, so you may Ctrl Click, Shift Click, or Drag and Click to select multiple.
+After you have made the selection, notice the components at the upper right, in the generated code section. 
+This system works through three component layers, Models which represent the tables data structure, business access which acts as a proxy to data access, and is also where are validation rules are expressed, and finally Data Access is the raw SQL connection layer. 
+This architecture is great because we already have it layered, meaning that if we wanted to create a ‘GraphQL Data Access Layer’ the rest of the code would still work! 
+If you are unsure, you may leave all three selected, and if you are just updating a single table this will not
+be a concern. 
+However, if you are regenerated many many tables, the process will be much quicker if
+you only generate the components in which you need. 
+I also wanted to mention that this architecture makes use of interfaces, so anything you generate will regenerate the associated interface. 
+For simply adding a new column to an existing table, you do not need to worry about those complexities. 
+However, if you are adding a new table there will be an extra step. 
+I will cover this advanced topic at the end of this guide. 
+For now, let us continue with the basic new column flow. 
+When you are ready for the next step, click the Generate Code button which can be found to the right of the previous refresh schema button. 
+You will see log output as the process iterates through your selection. 
+When the process has completed, you will see a ‘Done!’ exclamation. 
+Since we checked out the entire ‘GeneratedCode’ folder, we will want to undo unchanged files, otherwise a code-reviewer will have a tough time seeing the changes. 
+I believe that most developers have this already configured, however, if you do not you can configure it in the following manner. 
+Install TFS Power Tools, one of the following, here is a quick link to several versions, for us the specific version does not overly matter, also in newer version this could be already bundled with your visual studio solution. 
+To check if you have it installed, simply run: tfpt from a command prompt. 
+If you get a response like below, you are already ready to rock and roll. 
+Now let’s add link the functionality to a quick menu item. 
+From visual studio, click the Tools menu, followed by ‘External Tools’.
+As you can see above, I already have the ‘Undo Unchanged Files’ added, but if you don’t have it, from External Tools click Add, and enter the following information. 
+Command is the tfpt.exe which we checked via command prompt. 
+Initial Directory is where unchanged files will be scanned, I set it to my base code path. 
+Make sure ‘Use Output window’ is selected so you can see its progress as the command runs. 
+When everything looks good, you are ready to click OK. 
+Now, from the ‘Tools’ menu you should see your new entry. 
+Now, you are ready to click Undo Unchanged Files. 
+If tfpt.exe encounters any errors you can also just attempt to undo all your pending changes via source control and simply say No to All, when asked about undoing changed files. 
+Either approach is fine. 
+When you are finished you should see a tidy list of pending changes. 
+Since we only made a column change we will only see the model and its interface listed. 
+Your interface will show changes to the private properties, and your model will show changes to the public properties, along with some base logic. 
+You are ready to now send a code review for your column change, generated by the fancy thenNewArchitecture. 
+For this stage, the steps for generation are the same, but you will need to add the files to the solution, and to source control. 
+Below I followed the steps as above, but have selected a new table. 
+As you can see the output is the same, however, we must follow the following additional steps. 
+First, in visual studio, make sure the following button is selected. 
+This will show all files, including those which are not added to the solution. 
+After selecting the button, noticed that a new file appears. 
+We will need to add the file for both the ‘Interfaces’ sub folder, and the outer folder for all three components Models, BusinessAccess, and DataAccess; this means that one new table will have six files which need to be added. 
+To add a file, right click on it and select Include In Project. 
+Also, perform the Add files to Source Control step after it gets included into the project. 
+You will know it has been added when you see this, Models\Interface. 
+Repeat this step for the other five locations, Models, BusinessAccess\Interface, DataAccess\Interface, DataAccess, and DataAccess. 
+Now within your pending changes, you should see the 6 added files, along with the 3 project edits. 
+Note, mine says 11 because I also had an edited solution file, and app.config; however, you should see 9 files when you add a table. 
+The Logic within the Magic: 
+In the following section we will explore the magical mechanics which allow this system to work! 
+This was a very exciting project because everything was made from scratch, no extra libraries were needed. 
+It recursively scans a template and populates keywords for their values.
+This recurses until all keywords have formed via the input. 
+Let’s take a quick peek at each template, first, it loads the NameSpaceWith Class. 
+The system then scans for keywords that are denoted like this magical keyword. 
+From the input, it then populates the content from input.
+In this template, LeadingClassName is the entity name such as PatientAppointment,
+and ClassContent is all of the other templates.
+Such as the RetreivingRules, the SavingRules, DeletingRules, and the ValidationContent. 
+For instance, the SavingRules appear like this:  
+If we every wanted to save though another option, such as Save function with two inputs we could write it here and the scaffolding machine would come to life and re-create the existing classes with the new
+logic. 
+There are templates for all actions, and interface prototypes. 
+Unless we need to adjust base logic, such as introducing new templates, we are able to edit the template and regenerate without needing to use Visual Studio. 
+If you would like more insight upon the magic feedback loop of recursion, please let me know. It is a wonderful approach which allow for magic in more places than just this code. 
+Microsoft Azure helps manage information and provides services to make life easier. 
+When we say store it on the cloud, we mean to store it on another computer. 
+The internet is just so responsive now that another’s computer can be just like ours. 
+In terms of blob storage, our clinic databases encountered resource concerns. 
+Azure lets us raise the blobs to an environment free of those pressures. 
+It will take care of the blobs and manage them regardless of where that data originated. 
+All you have to do is ask, and it takes care of the rest. 
+Yeah, I get how it sounds, but Microsoft Azure is amazing. 
+The reason it is amazing goes beyond blob storage. 
+For DbSync we use the service bus, which allows for databases to talk directly to each other. 
+Virtual Machines allow you to connect with it just like it was your own computer. 
+Oh, and a really cool one is App Services and Function Apps! 
+They allow you to put just a part of a program in the cloud, and call it from your local program. 
+We use this for faxing, we have a fax function in the cloud, and EMR is able to call it whenever it needs. 
+Then the function places the fax, and then calls back the EMR via the WebAPI to confirm the fax status. 
+Microsoft Azure even allows you to learn and create Machine Learning stuff with a few clicks of a button. 
+Oh, and you know in the SOAP tab how you can click the Microphone to Dictate. 
+Microsoft Azure making life easier again! 
+We simply send it a voice recording, and it returns the text that represents it. 
+I get that as a company we do not want to rely completely on a third-party. 
+This is why initially we do have data-backups, but once we are confident Azure has some amazing options. 
+In fact, Azure even supports backups within their infrastructure. 
+In terms of backups, it lets you say… hey give me some locally redundant data.
+If one server crashes your data exists on a neighbouring server, or you could request geo-redundant data. 
+Even if the entire building caught fire, it is ok because your data is backed up at another physical location. 
+This only scratches the surface of what is possible. 
+Cloud technology is really changing the world, and it creates so many new options. 
+How Computers Share Secret Messages (SSL) via Public-Key Asymmetric Cryptography Computers are pretty slick.
+They can share secret messages with each other, and only the sender and recipient are able to decipher the content. 
+The modern internet and communicating world would not be able to exist without the ability to send and receive secure messages. 
+Whether HTTPS communication, or secure API communication the concept of a Private Key, and a Public Key is the core knowledge you need to understand how it works. 
+Anna, do you Remember that ongoing fun game that we chatted about? 
+You know the one, when Rick provided me with a secret key in person. 
+Well, prepare yourself, for things are going to be demystified a little bit here. 
+One reason that I am sharing this now is because you have been doing it too!
+Every time you request a Blob from Azure the request arrives in a 'locked' state, and to read it we need to know some secret knowledge; with the knowledge we are able to read the message. 
+However, rest assured that only you will know what the hidden message means, because of the private-key that you hold. 
+Once Upon a Time, Encryption used one key for both encrypting the message and decrypting it. 
+However, this created a challenge because we want our clients to be able to secure or encrypt the message, which meant we had to share the key. 
+However, if we shared the key then other people might find it, and eavesdrop on the communication. This symmetric encryption evolved into something better: Asymmetric Cryptography! 
+It is called asymmetric cryptograph because it uses Two Different, yet Mathematically Connected keys! 
+Through these key-pairs something pretty incredible is possible, and we would not have the modern internet without it! 
+One of these Keys can be publicly shared, while the other is kept private. 
+You can imagine these however you like, a pair of keys, a pair of paintings, or perhaps an encoder ring with a matching decoder ring. 
+In the internet world, these keys are called computer certificates. 
+A CER file is a certificate with just the public key information for encryption, a PVK file just contains the private key for decryption, and a PFX certificate contains both the public key and private key together. 
+A public key is public. 
+You could put this on the wall for everyone to see, and you would not have to be concerned with others figuring out the message. 
+They could use the public key to encrypt something, but they would not be able to decrypt an encrypted message for that they would require the secret or private key. 
+When you go to an HTTPS website you can click the padlock you can download the certificate, such a certificate is a public key. 
+Every website you go to that shows a padlock has presented you with a public key. 
+Having this public key allows you to communicate back to them in a secure fashion. 
+Even if there was someone trying to eavesdrop, they would only hear the encrypted speech. 
+They would not know what is being communicated unless they had access to the private key. 
+A private key is private, and only authorized parties get to see this. 
+The private key is the secret that allow the encrypted message to be read. 
+There are many ways to generate public and private key pairs. For us, we mainly use RSA-SHA256 encryption. 
+RSA encryption is named after those who created it, namely Ron Rivest, Ali Shamir, and Leonard Adelman. 
+It uses powers of prime numbers for its magic. Since Factorials are very hard problems for computers, one does not have to worry about a machine being able to brute-force generate a key. 
+With current computer power it would take an infeasible amount of time. 
+But remember, Computers are getting faster and faster, which means that as computers evolve so must the security in which we implement. 
