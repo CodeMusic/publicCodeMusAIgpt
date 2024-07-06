@@ -71,7 +71,7 @@ for epoch in range(num_epochs):
 
 #save model
 thePath = path.join(path.dirname(__file__),'_activeMinds', 'codemusai.pt')
-mind.LanguageCortex.save_model(thePath)
+mind.cortices.LanguageCortex.save_model(thePath)
 print("Training complete.")
 
 

@@ -24,7 +24,7 @@ mind.loadMemories('gpt2')
 #load additional model
 thePath = path.join(path.dirname(__file__),'_activeMinds', 'codemusai.pt')
 if path.exists(thePath):
-    mind.LanguageCortex.load_model(thePath, config)
+    mind.cortices.LanguageCortex.load_model(thePath, config)
     print(f"Model loaded from {thePath}")
 else:
     print(f"Model not found at {thePath}")
@@ -39,7 +39,7 @@ gradualOutput = True
 if gradualOutput:
     print('')
     print(initial_prompt, end='', flush=True)
-    
+
 mind.eval()
 with torch.no_grad():
     generated_output = mind.cortices.LanguageCortex.generate(initial_input, max_new_tokens=50, gradualOutput=gradualOutput, temperature=1.0, top_k=10)
