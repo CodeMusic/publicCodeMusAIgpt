@@ -1,3 +1,81 @@
+from CodeMusai.CognitiveClarifier import CognitiveClarifier
+from CodeMusai.ThoughtProcessor import ThoughtProcessor
+from CodeMusai.Cortex import Cortex
+from CodeMusai.NeuralCircuitSettings import NeuralCircuitSettings
+from CodeMusai.Mind import Mind
+import torch
+import os.path as path
+
+from torch.utils.data import DataLoader, Dataset
+
+# Define a sample configuration
+class SampleConfig(NeuralCircuitSettings):
+    def __init__(self):
+        self.vocabSize = 50257
+        self.memorySpan = 128
+        self.n_embd = 768
+        self.n_head = 12
+        self.dropout = 0.1
+        self.n_layer = 12
+        self.bias = True
+
+# Sample dataset
+class RandomDataset(Dataset):
+    def __init__(self, vocab_size, sequence_length, num_samples):
+        self.vocab_size = vocab_size
+        self.sequence_length = sequence_length
+        self.num_samples = num_samples
+
+    def __len__(self):
+        return self.num_samples
+
+    def __getitem__(self, idx):
+        input_data = torch.randint(0, self.vocab_size, (self.sequence_length,))
+        target_data = input_data.clone()
+        return input_data, target_data
+
+# Create an instance of the Mind class
+config = SampleConfig()
+mind = Mind(config)
+
+# Load the random model
+#mind.loadMemories('gpt2')
+
+# Prepare the dataset and dataloader
+dataset = RandomDataset(config.vocabSize, config.memorySpan, 1000)
+dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+
+# Configure the optimizer
+weight_decay = 0.01
+learning_rate = 3e-4
+betas = (0.9, 0.95)
+device_type = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+optimizer = mind.configureNeuralOptimizers(weight_decay, learning_rate, betas, device_type)
+
+# Training loop
+mind.to(device_type)
+mind.train()
+
+num_epochs = 3
+for epoch in range(num_epochs):
+    for batch_idx, (inputs, targets) in enumerate(dataloader):
+        inputs, targets = inputs.to(device_type), targets.to(device_type)
+        optimizer.zero_grad()
+        logits, loss = mind(inputs, targets)
+        loss.backward()
+        optimizer.step()
+
+        if batch_idx % 100 == 0:
+            print(f"Epoch {epoch}, Batch {batch_idx}, Loss: {loss.item()}")
+
+#save model
+thePath = path.join(path.dirname(__file__),'_activeMinds', 'codemusai.pt')
+mind.LanguageCortex.save_model(thePath)
+print("Training complete.")
+
+
+"""
 
 from dataclasses import dataclass
 import torch
@@ -184,12 +262,13 @@ class Cortex(nn.Module):
 
 
     def get_num_params(self, non_embedding=True):
-        """
+-
         Return the number of parameters in the model.
         For non-embedding count (default), the position embeddings get subtracted.
         The token embeddings would too, except due to the parameter sharing these
         params are actually used as weights in the final layer, so we include them.
-        """
+-
+        
         n_params = sum(p.numel() for p in self.parameters())
         if non_embedding:
             n_params -= self.transformer.wpe.weight.numel()
@@ -239,6 +318,10 @@ class Cortex(nn.Module):
         model_hf = GPT2LMHeadModel.from_pretrained(model_type)
         sd_hf = model_hf.state_dict()
 
+
+
+        
+
         # copy while ensuring all of the parameters are aligned and match in names and shapes
         sd_keys_hf = sd_hf.keys()
         sd_keys_hf = [k for k in sd_keys_hf if not k.endswith('.attn.masked_bias')] # ignore these, just a buffer
@@ -268,12 +351,20 @@ class Cortex(nn.Module):
 
 
 #-------------
-num_return_sequences = 5
-max_length = 30
+num_return_sequences = 1
+max_length = 150
 topK = 50
-device = 'mps'
+
+#detect device
+device = 'cpu' 
+if torch.cuda.is_available():
+    device = 'cuda'
+elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+    device = 'mps'
+print(f"using device: {device}")
 
 model = Cortex.from_pretrained('gpt2')
+#model = Cortex(CodeMusaiConfig())
 print('model loaded')
 model.eval()
 model.to(device)
@@ -282,7 +373,7 @@ model.to(device)
 #prefix
 import tiktoken
 enc = tiktoken.encoding_for_model('gpt2')
-tokens = enc.encode('Hello, I am CodeMusai,')
+tokens = enc.encode('Hello, I am CodeMusai,') #Hello, I am CodeMusai,
 tokens = torch.tensor(tokens, dtype=torch.long) #(8,)
 tokens = tokens.unsqueeze(0).repeat(num_return_sequences, 1) #(5,8)
 x = tokens.to(device)
@@ -316,4 +407,7 @@ while x.size(1) < max_length:
 for i in range(num_return_sequences):
     tokens = x[i, :max_length].tolist()
     decoded = enc.decode(tokens)
+    print('~~~~')
     print(">", decoded)
+    print('~~~~')
+"""
