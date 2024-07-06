@@ -15,7 +15,7 @@ class SampleConfig(NeuralCircuitSettings):
         self.memorySpan = 128
         self.n_embd = 768
         self.n_head = 12
-        self.dropout = 0.1
+        self.dropout = 0
         self.n_layer = 12
         self.bias = True
 
@@ -39,7 +39,16 @@ config = SampleConfig()
 mind = Mind(config)
 
 # Load the random model
-#mind.loadMemories('gpt2')
+mind.loadMemories('gpt2')
+
+#load additional model
+thePath = path.join(path.dirname(__file__),'_activeMinds', 'codemusai.pt')
+if path.exists(thePath):
+    mind.cortices.LanguageCortex.load_model(thePath, config)
+    print(f"Previous model loaded from {thePath}")
+else:
+    print(f"Previous model not found at {thePath}")
+
 
 # Prepare the dataset and dataloader
 dataset = RandomDataset(config.vocabSize, config.memorySpan, 1000)
@@ -49,7 +58,7 @@ dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 weight_decay = 0.01
 learning_rate = 3e-4
 betas = (0.9, 0.95)
-device_type = 'cuda' if torch.cuda.is_available() else 'cpu'
+device_type = 'cuda' if torch.cuda.is_available() else 'mps'
 
 optimizer = mind.configureNeuralOptimizers(weight_decay, learning_rate, betas, device_type)
 
@@ -57,7 +66,7 @@ optimizer = mind.configureNeuralOptimizers(weight_decay, learning_rate, betas, d
 mind.to(device_type)
 mind.train()
 
-num_epochs = 3
+num_epochs = 1000
 for epoch in range(num_epochs):
     for batch_idx, (inputs, targets) in enumerate(dataloader):
         inputs, targets = inputs.to(device_type), targets.to(device_type)
@@ -68,6 +77,9 @@ for epoch in range(num_epochs):
 
         if batch_idx % 100 == 0:
             print(f"Epoch {epoch}, Batch {batch_idx}, Loss: {loss.item()}")
+            thePath = path.join(path.dirname(__file__),'_activeMinds', 'codemusai.pt')
+            mind.cortices.LanguageCortex.save_model(thePath)    
+            print(f"Checkpoint saved to {thePath}")
 
 #save model
 thePath = path.join(path.dirname(__file__),'_activeMinds', 'codemusai.pt')
